@@ -3,6 +3,8 @@ install.packages("pacman")
 pacman::p_load(pacman,httr,tidyr,tidyverse,readr,stringr,dplyr,rlang,magrittr)
 
 #API to extract CSV 
+#I have disabled the token for confidentiality purposes; instead an Open Source dataset is being utilized for running the Script below
+
 # token <- token_path
 # url <- url_path
 # formData <- list("token"=token,
@@ -25,37 +27,38 @@ pacman::p_load(pacman,httr,tidyr,tidyverse,readr,stringr,dplyr,rlang,magrittr)
 #CSV File
 dataframe  <- read_csv("https://raw.githubusercontent.com/MattKowalczyk/API-AND-Regex-for-Processing-Questionnaires/main/Questionnaire_headers_data.csv")
 
-#Cleaning the data to make the code below generalizable on any data import as long as column name is the same (questionnaire 
-#header needs to be provided)
+#Cleaning the data to make the code below generalizable on any data import as long as column name is the same 
+#questionnaire header NEEDS to be provided
 
 #extract column names and make all columns lowercase
 all_lower <- tolower(colnames(dataframe))
 
-#removes all special characters
+#removes all special characters using Regex (regular expression)
 all_lower <- str_replace_all(all_lower, "[^a-zA-Z0-9']", " ") 
 #takes multiple spaces and converts to one space
 all_lower <- gsub("\\s+", " ", all_lower)
 
-#Assigning Questions to Assessments Based on regular expression
+#Assigning Questions to Assessments Based on patterns
 
-#Big5
+#Big5 Assessment
 big5 <- str_match(all_lower, pattern = "i am someone who")
 all_na<- is.na(big5)
 big5 <- which(all_na==FALSE)
 big5 <- dataframe[,big5]
 
 #All sections below will assign the first and last question in each questionnaire as the range
-#NOTE: The first and last question of each questionnaire must be included, else script will return 
-#an error
+#NOTE: The first and last question of each questionnaire must be included
+#For future database entry, make answering the first and last question of each questionnaire mandatory
+#so that the script does not encounter an error
 
-#MIST
+#MIST Assessment
 mist.first <-grep("morocco",all_lower)
 mist.last <- grep("international relations experts",all_lower)
 Mist <- dataframe[, mist.first:mist.last]
 
 ##Scoring##
 
-#Big5
+#Big5 (regular scoring)
 big5_regular <- big5 %>% 
   mutate(
     across(c(1:2, 6:7, 10, 13:15, 18:21, 27, 32:35, 38:41, 43, 46, 52:54, 56:57, 59:60),
@@ -94,6 +97,7 @@ Mist_recode <- ifelse(Mist[,1:10] == "FALSE",1,0)
 Mist <- cbind(data.frame(Mist_recode),Mist_real)
 
 ##Score Calculations##
+#Creating new columns with Scored Entries
 
 #Big 5 Calculations
 big5 %<>%
