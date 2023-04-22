@@ -27,7 +27,7 @@ pacman::p_load(pacman,httr,tidyr,tidyverse,readr,stringr,dplyr,rlang,magrittr)
 #CSV File
 dataframe  <- read_csv("https://raw.githubusercontent.com/MattKowalczyk/API-AND-Regex-for-Processing-Questionnaires/main/Questionnaire_headers_data.csv")
 
-#Cleaning the data to make the code below generalizable on any data import as long as column name is the same 
+#Cleaning the data to make the code below generalizable on any data import as long as the questionnaires are the same
 #questionnaire header NEEDS to be provided
 
 #extract column names and make all columns lowercase
